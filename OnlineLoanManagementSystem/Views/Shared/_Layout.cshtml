@@ -280,6 +280,13 @@
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
+                <a class="nav-link " href="/Home/LoanType">
+                    <i class="bi bi-grid"></i>
+                    <span>Loan Type</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
@@ -506,8 +513,8 @@
 
     <main id="main" class="main">
 
-    @RenderBody()
-      
+        @RenderBody()
+
     </main><!-- End #main -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
@@ -537,7 +544,8 @@
 
     <!-- Template Main JS File -->
     <script src="~/Content/assets/js/main.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @RenderSection("scripts", false)
 </body>
 
 </html>

@@ -48,6 +48,35 @@ namespace OnlineLoanManagementSystem.App_Code
             return dt;
         }
 
+
+        public static int RunCmd(string Query)
+        {
+            int d = 0;
+            var con = new SqlConnection(ConfigurationManager.ConnectionStrings["connectionstring"].ConnectionString);
+            try
+            {
+                if (con.State != ConnectionState.Open)
+                {
+                    con.Open();
+                }
+                SqlCommand com = new SqlCommand(Query, con);
+                com.CommandTimeout = 0;
+                d = Convert.ToInt32((object)com.ExecuteNonQuery());
+            }
+
+            catch (Exception)
+            {
+                return d;
+            }
+            finally
+            {
+                con.Close();
+            }
+            return d;
+
+        }
+
+
         public static string Encrypt(string clearText)
         {
             string EncryptionKey = "KAY2JOSH4PBNI99212";

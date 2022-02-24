@@ -1,0 +1,148 @@
+﻿<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Loan Types</h5>
+                    <p>This is a master for adding/updating loan types</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditLoanTypeModal()">
+                            Add loan type
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblLoanType">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Duration</th>
+                                <th scope="col">Rate</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="loanTypeAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Loan Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtLoanTypeId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtLoanTypeName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Duration</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtDuration" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Rate</label>
+                        <div class="col-sm-10">
+                            <input type="number" id="txtRate" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditLoanType()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gloanTypeData = [];
+        $(document).ready(() => {
+            loadLoanType();
+        });
+
+        function loadLoanType() {
+            $.ajax({
+                url: "/Home/GetLoanType",
+                type: "get",
+                success: function (res) {
+                    gloanTypeData = JSON.parse(res);
+                    let tableString = "";
+                    $.each(gloanTypeData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.LoanType + "</td>";
+                        tableString += "<td>" + data.Duration + "</td>";
+                        tableString += "<td>" + data.Rate + "</td>";
+                        tableString += '<td><button type="button" onClick="AddEditLoanTypeModal(' + data.LoanTypeId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblLoanType tbody').empty().append(tableString);
+
+                    const datatables = [document.querySelector("#tblLoanType")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditLoanTypeModal(id) {
+            if (id) {
+                loanType = gloanTypeData.find(_ => _.LoanTypeId = id);
+                $('#txtLoanTypeId').val(loanType.LoanTypeId);
+                $('#txtLoanTypeName').val(loanType.LoanType);
+                $('#txtDuration').val(loanType.Duration);
+                $('#txtRate').val(loanType.Rate);
+            } else {
+                $('#txtLoanTypeId').val("");
+                $('#txtLoanTypeName').val("");
+                $('#txtDuration').val("");
+                $('#txtRate').val("");
+            }
+            $('#loanTypeAddEdit').modal('show');
+        }
+
+        function AddEditLoanType() {
+            let loanTypeId = Number($('#txtLoanTypeId').val());
+            let loanType = $('#txtLoanTypeName').val();
+            let duration = $('#txtDuration').val();
+            let rate = $('#txtRate').val();
+
+            $.ajax({
+                url: "/Home/AddUpdateLoanType",
+                type: "post",
+                async: false,
+                data: { loanTypeId, loanType, duration, rate },
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadLoanType();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#loanTypeAddEdit').modal('hide');
+        };
+    </script>
+};
+

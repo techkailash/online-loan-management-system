@@ -15,10 +15,32 @@ namespace OnlineLoanManagementSystem.Controllers
             return View();
         }
 
-        public string GetProductListString()
+        public ActionResult LoanType()
         {
-            var productData = JsonConvert.SerializeObject(DatabaseCon.GetData("select ProductId, ProductName from Product"));
-            return productData;
+            return View();
+        }
+
+        public string GetLoanType()
+        {
+            var loanTypeData = JsonConvert.SerializeObject(DatabaseCon.GetData("select * from tblLoanType"));
+
+            return loanTypeData;
+        }
+
+        [HttpPost]
+        public int AddUpdateLoanType(string loanType, string duration, int rate, int loanTypeId)
+        {
+            int isQueryRun = 0;
+            if (loanTypeId != 0)
+            {
+                isQueryRun = DatabaseCon.RunCmd($"update tblLoanType set Loantype='{loanType}', Duration='{duration}', Rate='{rate}' where loantypeid={loanTypeId}");
+            }
+            else
+            {
+                isQueryRun = DatabaseCon.RunCmd($"insert into tblLoanType values('{loanType}','{duration}', '{rate}' )");
+            }
+
+            return isQueryRun;
         }
 
         public ActionResult About()
