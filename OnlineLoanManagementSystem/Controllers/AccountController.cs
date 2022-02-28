@@ -21,6 +21,10 @@ namespace OnlineLoanManagementSystem.Controllers
 
             if (checkLoginDetails.Rows.Count > 0)
             {
+                var empType = checkLoginDetails.Rows[0][3];
+                Session["loginEmpType"] = empType;
+                Session["loginId"] = checkLoginDetails.Rows[0][0];
+                Session["loginUserName"] = userName;
                 return RedirectToAction("Index", "Home");
             }
             return RedirectToAction("Login");

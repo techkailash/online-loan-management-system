@@ -1,0 +1,164 @@
+﻿
+@{
+    ViewBag.Title = "Customer";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Customer</h5>
+                    <p>This is a master for adding/updating Customer</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditCustomerModal()">
+                            Add Customer
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblCustomer">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Customer Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="CustomerAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtCustomerId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Customer Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtCustomerName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Phone</label>
+                        <div class="col-sm-10">
+                            <input type="number" id="txtPhone" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Address</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtAddress" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditCustomer()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gCustomerData = [];
+        $(document).ready(() => {
+            loadCustomer();
+        });
+
+        function loadCustomer() {
+            $.ajax({
+                url: "/Customer/GetCustomer",
+                type: "get",
+                success: function (res) {
+                    gCustomerData = JSON.parse(res);
+                    let tableString = "";
+                    $.each(gCustomerData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.Name + "</td>";
+                        tableString += "<td>" + data.Email + "</td>";
+                        tableString += "<td>" + data.Phone + "</td>";
+                        tableString += "<td>" + data.Address + "</td>";
+                        tableString += '<td><button type="button" onClick="AddEditCustomerModal(' + data.CId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblCustomer tbody').empty().append(tableString);
+
+                    const datatables = [document.querySelector("#tblCustomer")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditCustomerModal(id) {
+            if (id) {
+                customer = gCustomerData.find(_ => _.CId = id);
+                $('#txtCustomerId').val(customer.CId);
+                $('#txtCustomerName').val(customer.Name);
+                $('#txtEmail').val(customer.Email);
+                $('#txtPhone').val(customer.Phone);
+                $('#txtAddress').val(customer.Address);
+            } else {
+                $('#txtCustomerId').val("");
+                $('#txtCustomerName').val("");
+                $('#txtEmail').val("");
+                $('#txtPhone').val("");
+                $('#txtAddress').val("");
+            }
+            $('#CustomerAddEdit').modal('show');
+        }
+
+        function AddEditCustomer() {
+            let CId = Number($('#txtCustomerId').val());
+            let Name = $('#txtCustomerName').val();
+            let Email = $('#txtEmail').val();
+            let Phone = $('#txtPhone').val();
+            let Address = $('#txtAddress').val();
+
+            $.ajax({
+                url: "/Customer/AddUpdateCustomer",
+                type: "post",
+                async: false,
+                data: { CId, Name, Email, Phone, Address },
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadCustomer();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#CustomerAddEdit').modal('hide');
+        };
+    </script>
+};
+
+

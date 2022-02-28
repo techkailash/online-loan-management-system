@@ -1,0 +1,148 @@
+﻿
+@{
+    ViewBag.Title = "Document";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Document</h5>
+                    <p>This is a master for adding/updating Document</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditDocumentModal()">
+                            Add Document
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblDocument">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Document Type</th>
+                                <th scope="col">Document Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="DocumentAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtDocumentId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Document Type</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtDocumentType" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Document Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtDocumentName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Select Document</label>
+                        <div class="col-sm-10">
+                            <input type="file" id="documentFile" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditDocument()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gDocumentData = [];
+        $(document).ready(() => {
+            loadDocument();
+        });
+
+        function loadDocument() {
+            $.ajax({
+                url: "/Document/GetDocument",
+                type: "get",
+                success: function (res) {
+                    gDocumentData = JSON.parse(res);
+                    let tableString = "";
+                    $.each(gDocumentData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.documentType + "</td>";
+                        tableString += "<td>" + data.documentName + "</td>";
+                        tableString += '<td><button type="button" onClick="AddEditDocumentModal(' + data.documentId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblDocument tbody').empty().append(tableString);
+
+                    const datatables = [document.querySelector("#tblDocument")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditDocumentModal(id) {
+            if (id) {
+                Document = gDocumentData.find(_ => _.documentId = id);
+                $('#txtDocumentId').val(Document.documentId);
+                $('#txtDocumentType').val(Document.documentType);
+                $('#txtDocumentName').val(Document.documentName);
+            } else {
+                $('#txtDocumentId').val("");
+                $('#txtDocumentType').val("");
+                $('#txtDocumentName').val("");
+            }
+            $('#DocumentAddEdit').modal('show');
+        }
+
+        function AddEditDocument() {
+            let DocumentId = Number($('#txtDocumentId').val());
+            let DocumentType = $('#txtDocumentType').val();
+            let DocumentName = $('#txtDocumentName').val();
+           
+            $.ajax({
+                url: "/Document/AddUpdateDocument",
+                type: "post",
+                async: false,
+                data: { DocumentId, DocumentType, DocumentName},
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadDocument();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#DocumentAddEdit').modal('hide');
+        };
+    </script>
+};
+
+

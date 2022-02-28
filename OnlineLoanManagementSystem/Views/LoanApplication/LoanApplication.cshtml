@@ -1,0 +1,151 @@
+﻿<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Loan Applicaotn</h5>
+                    <p>This is a master for adding/updating loan types</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditLoanTypeModal()">
+                            Apply New Loan
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblLoanType">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Company Name</th>
+                                <th scope="col">Loan Type</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="loanTypeAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Loan Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtLoanTypeId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Loan Type</label>
+                        <div class="col-sm-10">
+                            @Html.DropDownList("customerData", ViewBag.customerData as SelectList, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Compay Name</label>
+                        <div class="col-sm-10">
+                            @Html.DropDownList("loanTypeData", ViewBag.loanTypeData as SelectList, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Amount</label>
+                        <div class="col-sm-10">
+                            @Html.DropDownList("loanMasterData", ViewBag.loanMasterData as SelectList, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Document Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtDocumentName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Duration</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtDocumentName" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditLoanType()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gloanTypeData = [];
+        $(document).ready(() => {
+            loadLoanType();
+        });
+
+        function loadLoanType() {
+            $.ajax({
+                url: "/Home/GetLoanType",
+                type: "get",
+                success: function (res) {
+                    gloanTypeData = JSON.parse(res);
+                    let tableString = "";
+                    
+
+                    const datatables = [document.querySelector("#tblLoanType")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditLoanTypeModal(id) {
+            if (id) {
+                loanType = gloanTypeData.find(_ => _.LoanTypeId = id);
+                $('#txtLoanTypeId').val(loanType.LoanTypeId);
+                $('#txtLoanTypeName').val(loanType.LoanType);
+                $('#txtDuration').val(loanType.Duration);
+                $('#txtRate').val(loanType.Rate);
+            } else {
+                $('#txtLoanTypeId').val("");
+                $('#txtLoanTypeName').val("");
+                $('#txtDuration').val("");
+                $('#txtRate').val("");
+            }
+            $('#loanTypeAddEdit').modal('show');
+        }
+
+        function AddEditLoanType() {
+            let loanTypeId = Number($('#txtLoanTypeId').val());
+            let loanType = $('#txtLoanTypeName').val();
+            let duration = $('#txtDuration').val();
+            let rate = $('#txtRate').val();
+
+            $.ajax({
+                url: "/Home/AddUpdateLoanType",
+                type: "post",
+                async: false,
+                data: { loanTypeId, loanType, duration, rate },
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadLoanType();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#loanTypeAddEdit').modal('hide');
+        };
+    </script>
+};
+

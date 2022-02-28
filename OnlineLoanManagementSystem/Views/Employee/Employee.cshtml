@@ -1,0 +1,165 @@
+﻿
+@{
+    ViewBag.Title = "Employee";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Employee</h5>
+                    <p>This is a master for adding/updating Employee</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditEmployeeModal()">
+                            Add Employee
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblEmployee">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Employee Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="EmployeeAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtEmployeeId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Employee Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtEmployeeName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Phone</label>
+                        <div class="col-sm-10">
+                            <input type="number" id="txtPhone" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Address</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtAddress" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditEmployee()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gEmployeeData = [];
+        $(document).ready(() => {
+            loadEmployee();
+        });
+
+        function loadEmployee() {
+            $.ajax({
+                url: "/Employee/GetEmployee",
+                type: "get",
+                success: function (res) {
+                    gEmployeeData = JSON.parse(res);
+                    let tableString = "";
+                    $.each(gEmployeeData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.Name + "</td>";
+                        tableString += "<td>" + data.Email + "</td>";
+                        tableString += "<td>" + data.Phone + "</td>";
+                        tableString += "<td>" + data.Address + "</td>";
+                        tableString += '<td><button type="button" onClick="AddEditEmployeeModal(' + data.CId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblEmployee tbody').empty().append(tableString);
+
+                    const datatables = [document.querySelector("#tblEmployee")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditEmployeeModal(id) {
+            if (id) {
+                employee = gEmployeeData.find(_ => _.CId = id);
+                $('#txtEmployeeId').val(employee.CId);
+                $('#txtEmployeeName').val(employee.Name);
+                $('#txtEmail').val(employee.Email);
+                $('#txtPhone').val(employee.Phone);
+                $('#txtAddress').val(employee.Address);
+            } else {
+                $('#txtEmployeeId').val("");
+                $('#txtEmployeeName').val("");
+                $('#txtEmail').val("");
+                $('#txtPhone').val("");
+                $('#txtAddress').val("");
+            }
+            $('#EmployeeAddEdit').modal('show');
+        }
+
+        function AddEditEmployee() {
+            let CId = Number($('#txtEmployeeId').val());
+            let Name = $('#txtEmployeeName').val();
+            let Email = $('#txtEmail').val();
+            let Phone = $('#txtPhone').val();
+            let Address = $('#txtAddress').val();
+
+            $.ajax({
+                url: "/Employee/AddUpdateEmployee",
+                type: "post",
+                async: false,
+                data: { CId, Name, Email, Phone, Address },
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadEmployee();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#EmployeeAddEdit').modal('hide');
+        };
+    </script>
+};
+
+
+

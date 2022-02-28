@@ -123,8 +123,17 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AboutUsController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CompanyController.cs" />
+    <Compile Include="Controllers\ContactUsController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
+    <Compile Include="Controllers\DocumentController.cs" />
+    <Compile Include="Controllers\EmiController.cs" />
+    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoanApplicationController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -506,6 +515,15 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\LoanType.cshtml" />
+    <Content Include="Views\Company\Company.cshtml" />
+    <Content Include="Views\Customer\Customer.cshtml" />
+    <Content Include="Views\Document\Document.cshtml" />
+    <Content Include="Views\Emi\Emi.cshtml" />
+    <Content Include="Views\Employee\Employee.cshtml" />
+    <Content Include="Views\LoanApplication\LoanApplication.cshtml" />
+    <Content Include="Views\AboutUs\AboutUs.cshtml" />
+    <Content Include="Views\ContactUs\ContactUs.cshtml" />
+    <Content Include="Views\Register\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

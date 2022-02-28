@@ -1,0 +1,163 @@
+﻿
+@{
+    ViewBag.Title = "Company";
+}
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Company</h5>
+                    <p>This is a master for adding/updating Company</p>
+                    <p style="text-align:right">
+                        <button type="button" class="btn btn-primary" onclick="AddEditCompanyModal()">
+                            Add Company
+                        </button>
+                    </p>
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable" id="tblCompany">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Company Name</th>
+                                <th scope="col">Start Date</th>
+                                <th scope="col">Trunover</th>
+                                <th scope="col">Owener Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="CompanyAddEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Company</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtCompanyId" class="form-control">
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Company Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtCompanyName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Start Date</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtStartDate" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Trunover</label>
+                        <div class="col-sm-10">
+                            <input type="number" id="txtTrunover" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Owener Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="txtOwenerName" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddEditCompany()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let gCompanyData = [];
+        $(document).ready(() => {
+            loadCompany();
+        });
+
+        function loadCompany() {
+            $.ajax({
+                url: "/Company/GetCompany",
+                type: "get",
+                success: function (res) {
+                    gCompanyData = JSON.parse(res);
+                    let tableString = "";
+                    $.each(gCompanyData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.CompanyName + "</td>";
+                        tableString += "<td>" + data.StartDate + "</td>";
+                        tableString += "<td>" + data.Trunover + "</td>";
+                        tableString += "<td>" + data.OwenerName + "</td>";
+                        tableString += '<td><button type="button" onClick="AddEditCompanyModal(' + data.CompanyId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblCompany tbody').empty().append(tableString);
+
+                    const datatables = [document.querySelector("#tblCompany")]
+                    datatables.forEach(datatable => {
+                        new simpleDatatables.DataTable(datatable);
+                    })
+                }
+            });
+        };
+
+
+        function AddEditCompanyModal(id) {
+            if (id) {
+                company = gCompanyData.find(_ => _.CompanyId = id);
+                $('#txtCompanyId').val(company.CompanyId);
+                $('#txtCompanyName').val(company.CompanyName);
+                $('#txtStartDate').val(company.StartDate);
+                $('#txtTrunover').val(company.Trunover);
+                $('#txtOwenerName').val(company.OwenerName);
+            } else {
+                $('#txtCompanyId').val("");
+                $('#txtCompanyName').val("");
+                $('#txtStartDate').val("");
+                $('#txtTrunover').val("");
+                $('#txtOwenerName').val("");
+            }
+            $('#CompanyAddEdit').modal('show');
+        }
+
+        function AddEditCompany() {
+            let CompanyId = Number($('#txtCompanyId').val());
+            let CompanyName = $('#txtCompanyName').val();
+            let StartDate = $('#txtStartDate').val();
+            let Trunover = $('#txtTrunover').val();
+            let OwenerName = $('#txtOwenerName').val();
+
+            $.ajax({
+                url: "/Company/AddUpdateCompany",
+                type: "post",
+                async: false,
+                data: { CompanyId, CompanyName, StartDate, Trunover, OwenerName},
+                success: function (res) {
+                    if (res > 0) {
+                        alert('Data saved successfully');
+                        loadCompany();
+                    }
+                    else {
+                        alert('Something went wrong. Please contact admin.');
+                    }
+                }
+            });
+            $('#CompanyAddEdit').modal('hide');
+        };
+    </script>
+};
+
+
