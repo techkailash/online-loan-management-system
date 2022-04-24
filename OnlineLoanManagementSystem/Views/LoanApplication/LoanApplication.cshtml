@@ -15,9 +15,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Company Name</th>
                                 <th scope="col">Loan Type</th>
                                 <th scope="col">Amount</th>
+                                <th scope="col">Duration</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -45,31 +45,19 @@
                     <div class="row mb-3">
                         <label for="inputText" class="col-sm-2 col-form-label">Loan Type</label>
                         <div class="col-sm-10">
-                            @Html.DropDownList("customerData", ViewBag.customerData as SelectList, new { @class = "form-control" })
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="inputText" class="col-sm-2 col-form-label">Compay Name</label>
-                        <div class="col-sm-10">
-                            @Html.DropDownList("loanTypeData", ViewBag.loanTypeData as SelectList, new { @class = "form-control" })
+                            @Html.DropDownList("loanType", ViewBag.loanTypeData as SelectList, new { @class = "form-control" })
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label for="inputText" class="col-sm-2 col-form-label">Amount</label>
                         <div class="col-sm-10">
-                            @Html.DropDownList("loanMasterData", ViewBag.loanMasterData as SelectList, new { @class = "form-control" })
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="inputText" class="col-sm-2 col-form-label">Document Name</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="txtDocumentName" class="form-control">
+                            <input type="text" id="txtRate" class="form-control">
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label for="inputText" class="col-sm-2 col-form-label">Duration</label>
                         <div class="col-sm-10">
-                            <input type="text" id="txtDocumentName" class="form-control">
+                            <input type="text" id="txtDuration" class="form-control">
                         </div>
                     </div>
                 </form>
@@ -96,8 +84,17 @@
                 success: function (res) {
                     gloanTypeData = JSON.parse(res);
                     let tableString = "";
-                    
-
+                    $.each(gloanTypeData, function (index, data) {
+                        tableString += "<tr>";
+                        tableString += "<td scope='row'>" + index + "</td>";
+                        tableString += "<td>" + data.LoanType + "</td>";
+                        tableString += "<td>" + data.Rate + "</td>";
+                        tableString += "<td>" + data.Duration + "</td>";
+                        tableString += "<td>Pending</td>";
+                        tableString += '<td><button type="button" onClick="AddEditLoanTypeModal(' + data.LoanTypeId + ')" class="btn btn-primary">Edit</button></td>';
+                        tableString += "</tr>";
+                    });
+                    $('#tblLoanType tbody').empty().append(tableString);
                     const datatables = [document.querySelector("#tblLoanType")]
                     datatables.forEach(datatable => {
                         new simpleDatatables.DataTable(datatable);

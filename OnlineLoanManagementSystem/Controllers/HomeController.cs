@@ -12,6 +12,11 @@ namespace OnlineLoanManagementSystem.Controllers
     {
         public ActionResult Index()
         {
+            var dashboarData = DatabaseCon.GetData("select COUNT(loanTypeId) as Sales, SUM(Rate) as Revenue, (select COUNT(loginid) as totalUser from tblLogin) as Customers from tblLoanType");
+
+            ViewBag.Sales = dashboarData.Rows[0]["Sales"];
+            ViewBag.Revenue = dashboarData.Rows[0]["Revenue"];
+            ViewBag.Customers = dashboarData.Rows[0]["Customers"];
             return View();
         }
 
@@ -53,6 +58,13 @@ namespace OnlineLoanManagementSystem.Controllers
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult MyProfile()
+        {
+            ViewBag.Message = "My Profile";
 
             return View();
         }

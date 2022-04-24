@@ -524,6 +524,7 @@
     <Content Include="Views\AboutUs\AboutUs.cshtml" />
     <Content Include="Views\ContactUs\ContactUs.cshtml" />
     <Content Include="Views\Register\Register.cshtml" />
+    <Content Include="Views\Home\MyProfile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
